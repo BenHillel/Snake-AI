@@ -102,7 +102,7 @@ public class Game extends Canvas implements Runnable{
 		}
 		System.out.println(snake.score);
 		highScore = maxScore;
-		updateData(snake.getBrain());
+		//updateData(snake.getBrain());
 		return snake;
 	}
 	

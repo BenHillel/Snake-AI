@@ -8,7 +8,7 @@ public class KeyInput extends KeyAdapter{
 	public static boolean[] keyPressed;
 	public KeyInput(Game game) {
 		this.game = game;
-		keyPressed = new boolean[2];
+		keyPressed = new boolean[3];
 		for(int i=0;i<keyPressed.length;i++) {
 			keyPressed[i] = false;
 		}
@@ -23,6 +23,12 @@ public class KeyInput extends KeyAdapter{
 		if(key == KeyEvent.VK_4) Game.AMOUNT_OF_TICKS = 100.0;
 		if(key == KeyEvent.VK_5) Game.AMOUNT_OF_TICKS = 500.0;
 		if(key == KeyEvent.VK_6) Game.AMOUNT_OF_TICKS = 1000.0;
+		if(key == KeyEvent.VK_7) Game.AMOUNT_OF_TICKS = 2000.0;
+		if(key == KeyEvent.VK_S) Game.AMOUNT_OF_TICKS = 1.0;
 		if(key == KeyEvent.VK_9) keyPressed[1] = !keyPressed[1];
+		
+		//YOS activation
+		if(key == KeyEvent.VK_Y) keyPressed[2] = !keyPressed[2];
+		
 	}
 }

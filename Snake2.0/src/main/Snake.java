@@ -1,6 +1,7 @@
 package main;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.util.Random;
 
@@ -14,8 +15,9 @@ public class Snake {
 	Dir dir;
 	private Brain brain;
 	private Apple apple;
-	public static int vesion = 10;
+	public static int vesion = 7;
 	private static int maxLife = 100;
+	private static Font YOS_FONT = new Font("Ariel",10,50);
 	
 	public Snake(Random r) {
 		this.x = new int[400];
@@ -32,7 +34,7 @@ public class Snake {
 		y[1]=10;
 		y[2]=10;
 		this.dir = Dir.LEFT;
-		this.brain = new Brain(10,10);
+		this.brain = new Brain(10,5);
 		this.apple = new Apple(r);
 	}
 	public Snake(Brain brain,Random r) {
@@ -78,13 +80,13 @@ public class Snake {
 	public double checkTile(int x,int y) {
 		for(int i=1;i<this.length;i++) {
 			if((this.x[i]==x && this.y[i]==y) || x>=Game.BOARDSIZE || y >=Game.BOARDSIZE || x<0 || y<0) {
-				return 0;
+				return -1;
 			}
 			if(x == this.apple.x && y == this.apple.y) {
-				return 1;
+				return 5;
 			}
 		}
-		return 0.5;
+		return 0;
 	}
 	
 	public double[] getInput() {
@@ -110,9 +112,9 @@ public class Snake {
 				this.score += 100;
 				this.length++;
 			}
-			if(this.checkTile(this.x[0], this.y[0])==0 || this.life<=0) {
+			if(this.checkTile(this.x[0], this.y[0])==-1 || this.life<=0) {
 				this.alive = false;
-				this.score += Math.min(this.timeAlive,20+10*this.length);
+				this.score += Math.min(this.timeAlive/3,20+10*this.length);
 			}
 		}
 	}
@@ -121,7 +123,21 @@ public class Snake {
 		if(this.alive) {
 			g.setColor(new Color((int)(255*(1-(this.life/(double)(maxLife+this.length*10)))),(int)(255*(this.life/(double)(maxLife+this.length*10))),0));
 			for(int i=0;i<this.length;i++) {
-				g.fillRect(x[i]*Game.SCL, y[i]*Game.SCL, Game.SCL, Game.SCL);
+				//Toggle the YOS settings
+				if(KeyInput.keyPressed[2]) {
+					g.setFont(YOS_FONT);
+					if(i==0) {
+						g.drawString("Y", this.x[i]*Game.SCL, this.y[i]*Game.SCL);
+					}else {
+						if(i==this.length-1) {
+							g.drawString("S", this.x[i]*Game.SCL, this.y[i]*Game.SCL);
+						}else {
+							g.drawString("O", this.x[i]*Game.SCL, this.y[i]*Game.SCL);
+						}
+					}
+				}else {
+					g.fillRect(x[i]*Game.SCL, y[i]*Game.SCL, Game.SCL, Game.SCL);
+				}
 			}
 			this.apple.render(g);
 		}
