@@ -1,6 +1,8 @@
 package main;
 
-import java.util.Random;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
 
 public class Brain {
 	private double[] input;
@@ -9,7 +11,7 @@ public class Brain {
 	double[] biase1,biase2,biase3;
 	int inputSize = Snake.vesion*Snake.vesion;
 	
-	public Brain(int len1,int len2) {
+	public Brain(int len1,int len2,boolean random) {
 		this.input = new double[inputSize];
 		this.lair1 = new double[len1];
 		this.lair2 = new double[len2];
@@ -20,10 +22,15 @@ public class Brain {
 		this.biase2 = new double[len2];
 		this.weights3 = new double[4][len2];
 		this.biase3 = new double[4];
-		this.randomSetup();
+		if(random) {
+			this.randomSetup();
+		}else {
+			this.takeStoredMind();
+		}
+		
 	}
 	
-	public Brain(double[][] weights1,double[][] weights2,double[][] weights3,double[] biase1,double[] biase2,double[] biase3,Random r) {
+	public Brain(double[][] weights1,double[][] weights2,double[][] weights3,double[] biase1,double[] biase2,double[] biase3,boolean mutate) {
 		this.weights1 = this.clone(weights1);
 		this.weights2 = this.clone(weights2);
 		this.weights3 = this.clone(weights3);
@@ -34,8 +41,12 @@ public class Brain {
 		this.lair2 = new double[biase2.length];
 		this.output = new double[4];
 		this.input = new double[inputSize];
-		this.mutate(r);
+		if(mutate) {
+			this.mutate();	
+		}
+		
 	}
+	/*
 	public Brain(double[][] weights1,double[][] weights2,double[][] weights3,double[] biase1,double[] biase2,double[] biase3) {
 		this.weights1 = this.clone(weights1);
 		this.weights2 = this.clone(weights2);
@@ -48,7 +59,7 @@ public class Brain {
 		this.output = new double[4];
 		this.input = new double[inputSize];
 	}
-	
+	*/
 	private void randomSetup() {
 		int len1 = this.lair1.length;
 		int len2 = this.lair2.length;
@@ -73,40 +84,40 @@ public class Brain {
 		}
 		
 	}
-	private double random(Random r) {
+	private double random() {
 		return Math.random()*Game.MUTATION_SIZE*2-Game.MUTATION_SIZE;
 	}
 	
-	public void mutate(Random r) {
+	public void mutate() {
 		int len1 = this.lair1.length;
 		int len2 = this.lair2.length;
 		for(int i=0;i<len1;i++) {
 			if(Math.random()<=Game.MUTATION_RATE) {
-				this.biase1[i] += this.random(r);
+				this.biase1[i] += this.random();
 			}
 			for(int j=0;j<inputSize;j++) {
 				if(Math.random()<=Game.MUTATION_RATE) {
-					this.weights1[i][j] += this.random(r);				
+					this.weights1[i][j] += this.random();				
 				}
 			}
 		}
 		for(int i=0;i<len2;i++) {
 			if(Math.random()<=Game.MUTATION_RATE) {
-				this.biase2[i] += this.random(r);
+				this.biase2[i] += this.random();
 			}
 			for(int j=0;j<len1;j++) {
 				if(Math.random()<=Game.MUTATION_RATE) {
-					this.weights2[i][j] += this.random(r);
+					this.weights2[i][j] += this.random();
 				}
 			}
 		}
 		for(int i=0;i<4;i++) {
 			if(Math.random()<=Game.MUTATION_RATE) {
-				this.biase3[i] += this.random(r);
+				this.biase3[i] += this.random();
 			}
 			for(int j=0;j<len2;j++) {
 				if(Math.random()<=Game.MUTATION_RATE) {
-					this.weights3[i][j] += this.random(r);
+					this.weights3[i][j] += this.random();
 				}
 			}
 		}
@@ -188,6 +199,65 @@ public class Brain {
 
 	public void setInput(double[] input) {
 		this.input = input;
+	}
+	
+	public double[][] readData(String path,int len1,int len2) {
+		double[][] data = new double[len1][len2];
+		try {
+			File file = new File(path);
+			Scanner scn = new Scanner(file);
+			int i=0;
+			int j=0;
+			while(scn.hasNextLine()) {
+				try {
+					data[i][j] = Double.valueOf(scn.nextLine());
+				}catch(IndexOutOfBoundsException e) {
+					break;
+				}
+				j++;
+				if(j==len2) {
+					j=0;
+					i++;
+				}
+			}
+			scn.close();
+			return data;
+			
+		}catch(FileNotFoundException e) {
+			e.printStackTrace();
+			return data;
+		}
+	}
+	public double[] readData(String path,int len1) {
+		double[] data = new double[len1];
+		try {
+			File file = new File(path);
+			Scanner scn = new Scanner(file);
+			int i=-1;
+			while(scn.hasNextLine()) {
+				i++;
+				try {
+					data[i] = Double.valueOf(scn.nextLine());
+				}catch(IndexOutOfBoundsException e) {
+					break;
+				}
+			}
+			scn.close();
+			return data;
+			
+		}catch(FileNotFoundException e) {
+			e.printStackTrace();
+			return data;
+		}
+	}
+	
+	public void takeStoredMind() {
+		this.weights1 = readData("weights1.txt",this.weights1.length,this.weights1[0].length);
+		this.weights2 = readData("weights2.txt",this.weights2.length,this.weights2[0].length);
+		this.weights3 = readData("weights3.txt",this.weights3.length,this.weights3[0].length);
+		this.biase1 = readData("biase1.txt",this.biase1.length);
+		this.biase2 = readData("biase2.txt",this.biase2.length);
+		this.biase3 = readData("biase3.txt",this.biase3.length);
 	}
 	
 }

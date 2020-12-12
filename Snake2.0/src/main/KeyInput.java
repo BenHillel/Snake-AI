@@ -24,6 +24,7 @@ public class KeyInput extends KeyAdapter{
 		if(key == KeyEvent.VK_5) Game.AMOUNT_OF_TICKS = 500.0;
 		if(key == KeyEvent.VK_6) Game.AMOUNT_OF_TICKS = 1000.0;
 		if(key == KeyEvent.VK_7) Game.AMOUNT_OF_TICKS = 2000.0;
+		if(key == KeyEvent.VK_8) Game.AMOUNT_OF_TICKS = 20000.0;
 		if(key == KeyEvent.VK_S) Game.AMOUNT_OF_TICKS = 1.0;
 		if(key == KeyEvent.VK_9) keyPressed[1] = !keyPressed[1];
 		

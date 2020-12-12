@@ -3,7 +3,9 @@ package main;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.util.Random;
+
+
+
 
 public class Snake {
 	int[] x,y;
@@ -15,11 +17,14 @@ public class Snake {
 	Dir dir;
 	private Brain brain;
 	private Apple apple;
-	public static int vesion = 7;
-	private static int maxLife = 100;
 	private static Font YOS_FONT = new Font("Ariel",10,50);
 	
-	public Snake(Random r) {
+	//Staff you can mess with-----------------------------
+	public static int vesion = 7;
+	private static int maxLife = 100;
+	//----------------------------------------------------
+	
+	public Snake() {
 		this.x = new int[400];
 		this.y = new int[400];
 		this.length=3;
@@ -34,10 +39,10 @@ public class Snake {
 		y[1]=10;
 		y[2]=10;
 		this.dir = Dir.LEFT;
-		this.brain = new Brain(10,5);
-		this.apple = new Apple(r);
+		this.brain = new Brain(Game.FIRST_LAIR_LEN,Game.SECOND_LAIR_LEN,true);
+		this.apple = new Apple();
 	}
-	public Snake(Brain brain,Random r) {
+	public Snake(Brain brain) {
 		this.x = new int[400];
 		this.y = new int[400];
 		this.length=3;
@@ -52,8 +57,8 @@ public class Snake {
 		y[1]=10;
 		y[2]=10;
 		this.dir = Dir.LEFT;
-		this.brain = new Brain(brain.weights1,brain.weights2,brain.weights3,brain.biase1,brain.biase2,brain.biase3,r);
-		this.apple = new Apple(r);
+		this.brain = new Brain(brain.weights1,brain.weights2,brain.weights3,brain.biase1,brain.biase2,brain.biase3,true);
+		this.apple = new Apple();
 	}
 
 	public void move() {
@@ -141,8 +146,11 @@ public class Snake {
 			}
 			this.apple.render(g);
 		}
-
 	}
+	
+
+
+	
 	public int getScore() {
 		return score;
 	}

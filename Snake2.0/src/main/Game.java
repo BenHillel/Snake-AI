@@ -19,13 +19,21 @@ public class Game extends Canvas implements Runnable{
 	public static double AMOUNT_OF_TICKS=10;
 	public static int[][] applesPos = new int[BOARDSIZE*BOARDSIZE][2];
 	
+	
+	//Staff you can mess with ------------------------------
+	//A bit of instructions:
+	//if you change the lairs size, you need to do one game of new train to update the brain memory to the current size
 	public static int MUTATION_SIZE=2;
 	public static double MUTATION_RATE = 0.1;
+	public static int FIRST_LAIR_LEN = 8,SECOND_LAIR_LEN = 5;
+	public boolean newTrain = true;
+	int num_of_victims = 2000;
+	//------------------------------------------------------
 	
+	Brain bestBrain;
 	public int generation;
 	public int highScore = 0;
 	boolean running = false;
-	int num_of_victims = 2000;
 	
 	private Font normalFont = new Font("Ariel",1,30);
 	private Font bigFont = new Font("David",10,80);
@@ -36,6 +44,7 @@ public class Game extends Canvas implements Runnable{
 	Random r;
 	
 	public Game() {
+		this.bestBrain = new Brain(FIRST_LAIR_LEN,SECOND_LAIR_LEN,false);
 		this.generation = 0;
 		this.addKeyListener(new KeyInput(this));
 		r = new Random();
@@ -44,9 +53,17 @@ public class Game extends Canvas implements Runnable{
 			applesPos[i][1] = r.nextInt(BOARDSIZE-1);
 		}
 		snakes = new Snake[num_of_victims];
-		for(int i=0;i<num_of_victims;i++) {
-			snakes[i] = new Snake(r);
+		if(newTrain) {
+			for(int i=0;i<num_of_victims;i++) {
+				snakes[i] = new Snake();
+			}
+		}else {
+			for(int i=0;i<num_of_victims;i++) {
+				snakes[i] = new Snake(bestBrain);
+			}
 		}
+
+
 		window = new Window(this);
 		
 	}
@@ -58,6 +75,12 @@ public class Game extends Canvas implements Runnable{
 	}
 	
 	public void run() {
+	    Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+	        public void run() {
+	            System.out.println("In shutdown hook");
+	            updateData(bestBrain);
+	        }
+	    }, "Shutdown-thread"));
 		this.requestFocus();
 		long lastTime = System.nanoTime();
 		double ns = 1000000000 / AMOUNT_OF_TICKS;
@@ -67,7 +90,7 @@ public class Game extends Canvas implements Runnable{
 		while(running) {
 			ns = 1000000000 / AMOUNT_OF_TICKS;
 			long now = System.nanoTime();
-			delta += (now-lastTime)/ns;
+			delta =min(AMOUNT_OF_TICKS*10,delta+(now-lastTime)/ns);
 			lastTime = now;
 			while(delta>=1) {
 				tick();
@@ -102,17 +125,17 @@ public class Game extends Canvas implements Runnable{
 		}
 		System.out.println(snake.score);
 		highScore = maxScore;
+		bestBrain = snake.getBrain();
 		//updateData(snake.getBrain());
 		return snake;
 	}
 	
 	public void evolution() {
-		Random r = new Random();
 		Snake sorviver = bestSnake(this.snakes);
-		this.snakes[0] = new Snake(r);
-		this.snakes[0].setBrain(new Brain(sorviver.getBrain().weights1,sorviver.getBrain().weights2,sorviver.getBrain().weights3,sorviver.getBrain().biase1,sorviver.getBrain().biase2,sorviver.getBrain().biase3));
+		this.snakes[0] = new Snake();
+		this.snakes[0].setBrain(new Brain(sorviver.getBrain().weights1,sorviver.getBrain().weights2,sorviver.getBrain().weights3,sorviver.getBrain().biase1,sorviver.getBrain().biase2,sorviver.getBrain().biase3,false));
 		for(int i=1;i<num_of_victims;i++) {
-			this.snakes[i] = new Snake(sorviver.getBrain(),r);
+			this.snakes[i] = new Snake(sorviver.getBrain());
 		}
 	}
 	
@@ -170,8 +193,8 @@ public class Game extends Canvas implements Runnable{
 		double[][] weights2 = brain.weights2;
 		double[][] weights3 = brain.weights3;
 		double[] biase1 = brain.biase1;
-		double[] biase2 = brain.biase1;
-		double[] biase3 = brain.biase1;
+		double[] biase2 = brain.biase2;
+		double[] biase3 = brain.biase3;
 		try {
 			File Weights1 = new File("weights1.txt");
 			if(Weights1.createNewFile()) {
@@ -274,11 +297,18 @@ public class Game extends Canvas implements Runnable{
 				biase3W.write(val);
 			}
 			biase3W.close();
+			System.out.println("==========UPDATED_DATA==========");
 		}catch(IOException e) {
-			
+			e.printStackTrace();
 		}
 	}
 	
+	public double min(double n1,double n2) {
+		if(n1<n2) return n1;
+		return n2;
+	}
+	
+
 	
 	public static void main(String[] args) {
 		new Game();
