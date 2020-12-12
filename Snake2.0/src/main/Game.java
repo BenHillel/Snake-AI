@@ -58,7 +58,9 @@ public class Game extends Canvas implements Runnable{
 				snakes[i] = new Snake();
 			}
 		}else {
-			for(int i=0;i<num_of_victims;i++) {
+			snakes[0] = new Snake();
+			snakes[0].setBrain(new Brain(this.bestBrain.weights1,this.bestBrain.weights2,this.bestBrain.weights3,this.bestBrain.biase1,this.bestBrain.biase2,this.bestBrain.biase3,false));
+			for(int i=1;i<num_of_victims;i++) {
 				snakes[i] = new Snake(bestBrain);
 			}
 		}
@@ -125,7 +127,7 @@ public class Game extends Canvas implements Runnable{
 		}
 		System.out.println(snake.score);
 		highScore = maxScore;
-		bestBrain = snake.getBrain();
+		this.bestBrain = snake.getBrain();
 		//updateData(snake.getBrain());
 		return snake;
 	}

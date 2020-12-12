@@ -46,20 +46,6 @@ public class Brain {
 		}
 		
 	}
-	/*
-	public Brain(double[][] weights1,double[][] weights2,double[][] weights3,double[] biase1,double[] biase2,double[] biase3) {
-		this.weights1 = this.clone(weights1);
-		this.weights2 = this.clone(weights2);
-		this.weights3 = this.clone(weights3);
-		this.biase1 = this.clone(biase1);
-		this.biase2 = this.clone(biase2);
-		this.biase3 = this.clone(biase3);
-		this.lair1 = new double[biase1.length];
-		this.lair2 = new double[biase2.length];
-		this.output = new double[4];
-		this.input = new double[inputSize];
-	}
-	*/
 	private void randomSetup() {
 		int len1 = this.lair1.length;
 		int len2 = this.lair2.length;
